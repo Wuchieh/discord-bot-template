@@ -1,0 +1,51 @@
+name: Build & Release Discord Bot
+
+on:
+  push:
+    tags:
+      - 'v*' # 當 tag 如 v1.0.0 被推送時觸發
+
+jobs:
+  build:
+    name: Build and Release Binaries
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64]
+
+    env:
+      CGO_ENABLED: 0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.2'
+
+      - name: Build binary
+        id: build
+        run: |
+          mkdir -p dist
+          export GOOS=${{ matrix.goos }}
+          export GOARCH=${{ matrix.goarch }}
+          EXT=""
+          if [ "$GOOS" = "windows" ]; then EXT=".exe"; fi
+
+          # Binary name format: discord-bot-template-<os>-<arch>
+          BINARY_NAME=discord-bot-template-${GOOS}-${GOARCH}${EXT}
+          go build -o dist/$BINARY_NAME ./cmd
+
+          echo "artifact=$BINARY_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: dist/${{ steps.build.outputs.artifact }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
