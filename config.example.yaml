@@ -1,0 +1,12 @@
+bot_token: token
+
+db:
+    file: database.db
+    log_level: warn
+
+reaction_role:
+    enabled: false
+    guild_id:
+        - GuildID1
+        - GuildID2
+        - GuildID3
