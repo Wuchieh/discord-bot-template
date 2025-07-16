@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/Wuchieh/candy-house-bot/internal/bootstrap"
+	"github.com/Wuchieh/discord-bot-template/internal/bootstrap"
 	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"

@@ -3,7 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
-	"github.com/Wuchieh/candy-house-bot/internal/config"
+	"github.com/Wuchieh/discord-bot-template/internal/config"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

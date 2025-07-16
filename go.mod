@@ -1,4 +1,4 @@
-module github.com/Wuchieh/candy-house-bot
+module github.com/Wuchieh/discord-bot-template
 
 go 1.24.2
 

@@ -2,9 +2,9 @@ package reaction_role
 
 import (
 	"fmt"
-	"github.com/Wuchieh/candy-house-bot/internal/bot/handler"
-	"github.com/Wuchieh/candy-house-bot/internal/database"
-	"github.com/Wuchieh/candy-house-bot/internal/model"
+	"github.com/Wuchieh/discord-bot-template/internal/bot/handler"
+	"github.com/Wuchieh/discord-bot-template/internal/database"
+	"github.com/Wuchieh/discord-bot-template/internal/model"
 	"github.com/bwmarrin/discordgo"
 	"gorm.io/gorm"
 	"log"

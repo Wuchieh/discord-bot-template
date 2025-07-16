@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Wuchieh/candy-house-bot/cmd"
+	"github.com/Wuchieh/discord-bot-template/cmd"
 )
 
 func main() {

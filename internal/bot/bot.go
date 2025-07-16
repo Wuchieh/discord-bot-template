@@ -2,9 +2,9 @@ package bot
 
 import (
 	"fmt"
-	"github.com/Wuchieh/candy-house-bot/internal/bot/handler"
-	_ "github.com/Wuchieh/candy-house-bot/internal/bot/handler/reaction_role"
-	"github.com/Wuchieh/candy-house-bot/internal/config"
+	"github.com/Wuchieh/discord-bot-template/internal/bot/handler"
+	_ "github.com/Wuchieh/discord-bot-template/internal/bot/handler/reaction_role"
+	"github.com/Wuchieh/discord-bot-template/internal/config"
 	"github.com/bwmarrin/discordgo"
 	"os"
 	"os/signal"

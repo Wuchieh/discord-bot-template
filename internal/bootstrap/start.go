@@ -3,10 +3,10 @@ package bootstrap
 import (
 	"errors"
 	"fmt"
-	"github.com/Wuchieh/candy-house-bot/internal/bot"
-	"github.com/Wuchieh/candy-house-bot/internal/config"
-	"github.com/Wuchieh/candy-house-bot/internal/database"
-	"github.com/Wuchieh/candy-house-bot/internal/model"
+	"github.com/Wuchieh/discord-bot-template/internal/bot"
+	"github.com/Wuchieh/discord-bot-template/internal/config"
+	"github.com/Wuchieh/discord-bot-template/internal/database"
+	"github.com/Wuchieh/discord-bot-template/internal/model"
 	"gopkg.in/yaml.v3"
 	"os"
 )
