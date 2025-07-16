@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 	"github.com/Wuchieh/candy-house-bot/internal/bot/handler"
+	_ "github.com/Wuchieh/candy-house-bot/internal/bot/handler/reaction_role"
 	"github.com/Wuchieh/candy-house-bot/internal/config"
 	"github.com/bwmarrin/discordgo"
 	"os"
@@ -38,6 +39,8 @@ func Start() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt, os.Kill)
 	<-sc
+
+	handler.RunOnBeforeClose(dg)
 
 	if err := dg.Close(); err != nil {
 		fmt.Println("關閉連線失敗:", err)
