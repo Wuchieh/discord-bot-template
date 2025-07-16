@@ -4,16 +4,18 @@ import (
 	"fmt"
 	"github.com/Wuchieh/discord-bot-template/internal/bot/handler"
 	_ "github.com/Wuchieh/discord-bot-template/internal/bot/handler/reaction_role"
-	"github.com/Wuchieh/discord-bot-template/internal/config"
 	"github.com/bwmarrin/discordgo"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-func Start() {
-	token := config.Get().Token
-	if token == "" {
+const (
+	DefaultToken = "token"
+)
+
+func Start(token string) {
+	if token == "" || token == DefaultToken {
 		fmt.Println("請配置機器人 Token")
 		return
 	}

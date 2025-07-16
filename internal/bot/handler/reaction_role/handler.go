@@ -12,12 +12,16 @@ import (
 
 const (
 	CommandName = "reaction_role"
-	GuildID     = "556095726996946974"
 )
+
+type Config struct {
+	Enabled bool     `yaml:"enabled"`
+	GuildID []string `yaml:"guild_id"`
+}
 
 var (
 	defaultMemberPermissions = int64(discordgo.PermissionManageGuild)
-	cmd                      *discordgo.ApplicationCommand
+	registeredCommands       = make(map[string]*discordgo.ApplicationCommand)
 	command                  = &discordgo.ApplicationCommand{
 		Name:                     CommandName,
 		DefaultMemberPermissions: &defaultMemberPermissions,
@@ -277,25 +281,29 @@ func removeAllReactionHandler(s *discordgo.Session, r *discordgo.MessageReaction
 	}
 }
 
-func init() {
+func Setup(cfg Config) {
+	if !cfg.Enabled {
+		return
+	}
+
 	fmt.Printf("加載模組: reaction_role, 指令: /%s\n", CommandName)
+
 	handler.OnOpened(func(s *discordgo.Session) {
-		_cmd, err := s.ApplicationCommandCreate(s.State.User.ID, GuildID, command)
-		if err != nil {
-			fmt.Printf("註冊 %s 指令失敗\n", CommandName)
-			panic(err)
-		} else {
-			cmd = _cmd
+		for _, guildID := range cfg.GuildID {
+			cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildID, command)
+			if err != nil {
+				fmt.Printf("GuildID: %s, %s 指令註冊失敗\n", guildID, CommandName)
+			} else {
+				registeredCommands[guildID] = cmd
+			}
 		}
 	})
 
 	handler.OnBeforeClose(func(s *discordgo.Session) {
-		if cmd == nil {
-			return
-		} else {
-			err := s.ApplicationCommandDelete(s.State.User.ID, GuildID, cmd.ID)
+		for guildID, cmd := range registeredCommands {
+			err := s.ApplicationCommandDelete(s.State.User.ID, guildID, cmd.ID)
 			if err != nil {
-				fmt.Printf("移除 %s 指令失敗\n", CommandName)
+				fmt.Printf("GuildID: %s, %s 指令移除失敗\n", guildID, CommandName)
 			}
 		}
 	})

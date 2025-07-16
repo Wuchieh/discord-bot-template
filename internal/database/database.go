@@ -3,7 +3,6 @@ package database
 import (
 	"errors"
 	"fmt"
-	"github.com/Wuchieh/discord-bot-template/internal/config"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -17,8 +16,12 @@ var (
 	db *gorm.DB
 )
 
-func Init() (err error) {
-	cfg := config.Get().DB
+type Config struct {
+	File     string `yaml:"file"`
+	LogLevel string `yaml:"log_level"`
+}
+
+func Setup(cfg Config) (err error) {
 	dbFile := cfg.File
 	logLevel := cfg.LogLevel
 

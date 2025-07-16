@@ -1,25 +1,36 @@
 package config
 
+import (
+	"github.com/Wuchieh/discord-bot-template/internal/bot"
+	"github.com/Wuchieh/discord-bot-template/internal/bot/handler/reaction_role"
+	"github.com/Wuchieh/discord-bot-template/internal/database"
+)
+
 var (
 	cfg *Config
 )
 
-type DB struct {
-	File     string `yaml:"file"`
-	LogLevel string `yaml:"log_level"`
-}
-
 type Config struct {
 	Token string `yaml:"bot_token"`
-	DB    DB     `yaml:"db"`
+
+	DB database.Config `yaml:"db"`
+
+	ReactionRole reaction_role.Config `yaml:"reaction_role"`
 }
 
 func GetDefault() Config {
 	return Config{
-		Token: "",
-		DB: DB{
+		Token: bot.DefaultToken,
+		DB: database.Config{
 			File:     "database.db",
 			LogLevel: "warn",
+		},
+		ReactionRole: reaction_role.Config{
+			GuildID: []string{
+				"GuildID1",
+				"GuildID2",
+				"GuildID3",
+			},
 		},
 	}
 }
