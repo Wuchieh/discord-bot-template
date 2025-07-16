@@ -1,51 +1,56 @@
-name: Build & Release Discord Bot
+name: Release
 
 on:
   push:
     tags:
-      - 'v*' # 當 tag 如 v1.0.0 被推送時觸發
+      - 'v*'  # 觸發條件：推送以 v 開頭的標籤 (如 v1.0.0)
 
 jobs:
   build:
-    name: Build and Release Binaries
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        goos: [linux, windows, darwin]
-        goarch: [amd64]
-
-    env:
-      CGO_ENABLED: 0
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v4
         with:
           go-version: '1.24.2'
 
-      - name: Build binary
-        id: build
+      - name: Get dependencies
+        run: go mod download
+
+      - name: Build for multiple platforms
         run: |
+          # 建立輸出目錄
           mkdir -p dist
-          export GOOS=${{ matrix.goos }}
-          export GOARCH=${{ matrix.goarch }}
-          EXT=""
-          if [ "$GOOS" = "windows" ]; then EXT=".exe"; fi
+          
+          # Linux AMD64
+          GOOS=linux GOARCH=amd64 go build -o dist/discord-bot-template-linux-amd64 .
+          
+          # Linux ARM64
+          GOOS=linux GOARCH=arm64 go build -o dist/discord-bot-template-linux-arm64 .
+          
+          # Windows AMD64
+          GOOS=windows GOARCH=amd64 go build -o dist/discord-bot-template-windows-amd64.exe .
+          
+          # macOS AMD64
+          GOOS=darwin GOARCH=amd64 go build -o dist/discord-bot-template-darwin-amd64 .
+          
+          # macOS ARM64 (Apple Silicon)
+          GOOS=darwin GOARCH=arm64 go build -o dist/discord-bot-template-darwin-arm64 .
 
-          # Binary name format: discord-bot-template-<os>-<arch>
-          BINARY_NAME=discord-bot-template-${GOOS}-${GOARCH}${EXT}
-          go build -o dist/$BINARY_NAME ./cmd
-
-          echo "artifact=$BINARY_NAME" >> "$GITHUB_OUTPUT"
-
-      - name: Upload Release Asset
-        uses: softprops/action-gh-release@v2
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref_name }}
-          files: dist/${{ steps.build.outputs.artifact }}
+          files: |
+            dist/discord-bot-template-linux-amd64
+            dist/discord-bot-template-linux-arm64
+            dist/discord-bot-template-windows-amd64.exe
+            dist/discord-bot-template-darwin-amd64
+            dist/discord-bot-template-darwin-arm64
+          generate_release_notes: true
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
