@@ -32,6 +32,8 @@ func Start() {
 		return
 	}
 
+	handler.RunOnOpened(dg)
+
 	fmt.Printf("%s 已啟動,  按下 CTRL-C 關閉機器人\n", dg.State.User.String())
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt, os.Kill)
