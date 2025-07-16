@@ -18,7 +18,10 @@ var (
 )
 
 func Init() (err error) {
-	dbFile := config.Get().DBFile
+	cfg := config.Get().DB
+	dbFile := cfg.File
+	logLevel := cfg.LogLevel
+
 	if !strings.HasSuffix(dbFile, ".db") {
 		return errors.New("無效的 db_file 名稱")
 	}
@@ -28,7 +31,20 @@ func Init() (err error) {
 		&gorm.Config{
 			Logger: logger.New(log.New(os.Stdout, "[GORM]", log.LstdFlags), logger.Config{
 				SlowThreshold: time.Second,
-				LogLevel:      logger.Info,
+				LogLevel: func() logger.LogLevel {
+					switch strings.ToLower(logLevel) {
+					case "info":
+						return logger.Info
+					case "warn":
+						return logger.Warn
+					case "error":
+						return logger.Error
+					case "silent":
+						return logger.Silent
+					default:
+						return logger.Warn
+					}
+				}(),
 			}),
 		})
 

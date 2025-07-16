@@ -7,7 +7,6 @@ import (
 	"github.com/Wuchieh/discord-bot-template/internal/model"
 	"github.com/bwmarrin/discordgo"
 	"gorm.io/gorm"
-	"log"
 	"strings"
 )
 
@@ -279,7 +278,7 @@ func removeAllReactionHandler(s *discordgo.Session, r *discordgo.MessageReaction
 }
 
 func init() {
-	log.Println("[reaction_role]")
+	fmt.Printf("加載模組: reaction_role, 指令: /%s\n", CommandName)
 	handler.OnOpened(func(s *discordgo.Session) {
 		_cmd, err := s.ApplicationCommandCreate(s.State.User.ID, GuildID, command)
 		if err != nil {
