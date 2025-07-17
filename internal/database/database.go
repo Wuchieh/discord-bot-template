@@ -3,7 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
-	"github.com/glebarez/sqlite"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"

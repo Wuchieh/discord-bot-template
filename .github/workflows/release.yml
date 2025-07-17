@@ -3,52 +3,79 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'  # 觸發條件：推送以 v 開頭的標籤 (如 v1.0.0)
+      - 'v*'
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.24.2'
-
-      - name: Get dependencies
-        run: go mod download
-
-      - name: Build for multiple platforms
+      - name: Build Linux binaries
         run: |
-          # 建立輸出目錄
           mkdir -p dist
-          
-          # Linux AMD64
           GOOS=linux GOARCH=amd64 go build -o dist/discord-bot-template-linux-amd64 .
-          
-          # Linux ARM64
           GOOS=linux GOARCH=arm64 go build -o dist/discord-bot-template-linux-arm64 .
-          
-          # Windows AMD64
-          GOOS=windows GOARCH=amd64 go build -o dist/discord-bot-template-windows-amd64.exe .
-          
-          # macOS AMD64
-          GOOS=darwin GOARCH=amd64 go build -o dist/discord-bot-template-darwin-amd64 .
-          
-          # macOS ARM64 (Apple Silicon)
-          GOOS=darwin GOARCH=arm64 go build -o dist/discord-bot-template-darwin-arm64 .
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: dist/*
 
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.2'
+      - name: Build Windows binaries
+        run: |
+          mkdir dist
+          go build -o dist/discord-bot-template-windows-amd64.exe .
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: dist/*
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.2'
+      - name: Build macOS binaries
+        run: |
+          mkdir -p dist
+          GOARCH=amd64 go build -o dist/discord-bot-template-darwin-amd64 .
+          GOARCH=arm64 go build -o dist/discord-bot-template-darwin-arm64 .
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: dist/*
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-linux, build-windows, build-macos]
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Show files
+        run: ls -R dist
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            dist/discord-bot-template-linux-amd64
-            dist/discord-bot-template-linux-arm64
-            dist/discord-bot-template-windows-amd64.exe
-            dist/discord-bot-template-darwin-amd64
-            dist/discord-bot-template-darwin-arm64
+          files: dist/**/*
           generate_release_notes: true
           draft: false
           prerelease: false
