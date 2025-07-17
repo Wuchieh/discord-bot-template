@@ -17,8 +17,8 @@ jobs:
       - name: Build Linux binaries
         run: |
           mkdir -p dist
-          GOOS=linux GOARCH=amd64 go build -o dist/discord-bot-template-linux-amd64 .
-          GOOS=linux GOARCH=arm64 go build -o dist/discord-bot-template-linux-arm64 .
+          GOOS=linux GOARCH=amd64 go build -o dist/discord-bot-linux-amd64 .
+          GOOS=linux GOARCH=arm64 go build -o dist/discord-bot-linux-arm64 .
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -36,7 +36,7 @@ jobs:
       - name: Build Windows binaries
         run: |
           mkdir dist
-          go build -o dist/discord-bot-template-windows-amd64.exe .
+          go build -o dist/discord-bot-windows-amd64.exe .
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -54,8 +54,8 @@ jobs:
       - name: Build macOS binaries
         run: |
           mkdir -p dist
-          GOARCH=amd64 go build -o dist/discord-bot-template-darwin-amd64 .
-          GOARCH=arm64 go build -o dist/discord-bot-template-darwin-arm64 .
+          GOARCH=amd64 go build -o dist/discord-bot-darwin-amd64 .
+          GOARCH=arm64 go build -o dist/discord-bot-darwin-arm64 .
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
