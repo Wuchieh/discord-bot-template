@@ -108,9 +108,26 @@ func commandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		}
 		return
 	}
-	if strings.HasPrefix(emoji, "<a:") && strings.HasSuffix(emoji, ">") {
-		emoji = strings.TrimPrefix(emoji, "<a:")
-		emoji = strings.TrimSuffix(emoji, ">")
+
+	var emojiApiName string
+	emoji = strings.TrimPrefix(emoji, "<")
+	emoji = strings.TrimSuffix(emoji, ">")
+	emojiSlice := strings.Split(emoji, ":")
+
+	switch len(emojiSlice) {
+	case 1:
+		emojiApiName = emoji
+	case 2:
+		emojiApiName = strings.Join(emojiSlice[0:2], ":")
+	case 3:
+		emojiApiName = strings.Join(emojiSlice[1:3], ":")
+	default:
+		if _, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: ptr("表情符號格式錯誤"),
+		}); err != nil {
+			fmt.Println("InteractionResponseEditError:", err)
+		}
+		return
 	}
 
 	role := appData.GetOption("role").RoleValue(s, i.GuildID)
@@ -136,7 +153,7 @@ func commandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	// 檢查是否已存在相同的emoji
 	for _, reaction := range message.Reactions {
-		if reaction.Emoji.APIName() == emoji {
+		if reaction.Emoji.APIName() == emojiApiName {
 			if _, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Content: ptr("已存在相同的 emoji"),
 			}); err != nil {
@@ -155,13 +172,13 @@ func commandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 				model.ReactionRole{
 					GuildID:   guildID,
 					MessageID: messageID,
-					Emoji:     emoji,
+					Emoji:     emojiApiName,
 				},
 			).First(&record)
 
 			record.GuildID = guildID
 			record.MessageID = messageID
-			record.Emoji = emoji
+			record.Emoji = emojiApiName
 			record.RoleID = role.ID
 
 			if err := tx.Save(&record).Error; err != nil {
@@ -172,7 +189,7 @@ func commandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			m := model.ReactionRole{
 				GuildID:   guildID,
 				MessageID: messageID,
-				Emoji:     emoji,
+				Emoji:     emojiApiName,
 				RoleID:    role.ID,
 			}
 
@@ -182,7 +199,7 @@ func commandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		}
 
 		// 在該訊息設置Emoji
-		if err := s.MessageReactionAdd(i.ChannelID, messageID, emoji); err != nil {
+		if err := s.MessageReactionAdd(i.ChannelID, messageID, emojiApiName); err != nil {
 			return fmt.Errorf("訊息設置Emoji失敗 %v", err)
 		}
 
@@ -216,7 +233,7 @@ func addReactionHandler(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
 
 	var record model.ReactionRole
 	db := database.GetDB()
-	db.Model(
+	db.Where(
 		model.ReactionRole{
 			GuildID:   guildID,
 			MessageID: messageID,
@@ -242,7 +259,7 @@ func removeReactionHandler(s *discordgo.Session, r *discordgo.MessageReactionRem
 
 	var record model.ReactionRole
 	db := database.GetDB()
-	db.Model(
+	db.Where(
 		model.ReactionRole{
 			GuildID:   guildID,
 			MessageID: messageID,
