@@ -9,8 +9,8 @@ var (
 )
 
 // AddHandler 添加事件 請執行於 init 中
-func AddHandler(handler any) {
-	handlers = append(handlers, handler)
+func AddHandler(handler ...any) {
+	handlers = append(handlers, handler...)
 }
 
 // OnOpened 添加 hook  請執行於 init 中

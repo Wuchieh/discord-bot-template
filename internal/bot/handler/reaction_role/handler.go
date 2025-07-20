@@ -325,8 +325,10 @@ func Setup(cfg Config) {
 		}
 	})
 
-	handler.AddHandler(commandHandler)
-	handler.AddHandler(addReactionHandler)
-	handler.AddHandler(removeReactionHandler)
-	handler.AddHandler(removeAllReactionHandler)
+	handler.AddHandler(
+		commandHandler,
+		addReactionHandler,
+		removeReactionHandler,
+		removeAllReactionHandler,
+	)
 }
